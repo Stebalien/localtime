@@ -1,0 +1,8 @@
+/* vim: set ft=javascript: */
+
+polkit.addRule(function(action, subject) {
+  if (action.id == "org.freedesktop.timedate1.set-timezone"
+      && subject.user == "tzupdated") {
+    return polkit.Result.YES;
+  }
+});
