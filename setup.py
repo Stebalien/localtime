@@ -22,7 +22,7 @@ setup(
     name = "tzupdate",
     version = "0.1",
     packages = find_packages(),
-    install_requires = ["dbus", "PyGObject", "tzwhere", "shapely", "numpy"],
+    install_requires = ["PyGObject", "tzwhere", "shapely", "numpy"],
     author = "Steven Allen",
     author_email = "steven@stebalien.com",
     description = "A timezone updater",
