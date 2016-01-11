@@ -51,24 +51,18 @@ class TZUpdater:
         self.geoclue.Stop()
 
     def _location_updated(self, loc):
-        print("getting location")
         location = dbus.Interface(self.bus.get_object(GEOCLUE2_BUS_NAME, loc), PROPERTIES_INTERFACE_NAME)
 
         latitude = location.Get(LOCATION_INTERFACE_NAME, 'Latitude')
         longitude = location.Get(LOCATION_INTERFACE_NAME, 'Longitude')
         
-        print("getting timezone", latitude, longitude)
         new_timezone = self.tzwhere.tzNameAt(latitude, longitude)
-        print("got timezone", new_timezone)
         if new_timezone == self.timezone:
             return
 
         self.timezone = new_timezone
 
-        try:
-            get_timedate(bus).SetTimezone(dbus.String(self.timezone), dbus.Boolean(False))
-        except:
-            print("Failed to set timezone")
+        get_timedate(bus).SetTimezone(dbus.String(self.timezone), dbus.Boolean(False))
 
 def main():
     # In order to make asynchronous calls, we need to setup an event loop
