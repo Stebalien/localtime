@@ -1,0 +1,21 @@
+[Unit]
+Description=Mailbox synchronization service
+
+[Service]
+User=tzupdated
+Group=tzupdated
+
+Nice=19
+IOSchedulingClass=idle
+CPUSchedulingPolicy=idle
+PrivateTmp=true
+PrivateDevices=true
+PrivateNetwork=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+
+ExecStart=/usr/bin/tzupdated
+
+[Install]
+WantedBy=default.target

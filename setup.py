@@ -35,4 +35,5 @@ setup(
       data_files=[
           ('/usr/share/polkit-1/rules.d/', ['10-tzupdate.rules']),
           ('/usr/lib/sysusers.d/', ['tzupdate.conf'])
+          ('/usr/lib/systemd/system/', ['tzupdate.service'])
       ]
