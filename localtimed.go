@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/Stebalien/go.dbus"
-	"github.com/bradfitz/latlong"
+	"dbus"
+	"latlong"
 	"os"
 )
 
