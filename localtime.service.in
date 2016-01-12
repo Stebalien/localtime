@@ -2,8 +2,8 @@
 Description=Timezone Updater Daemon
 
 [Service]
-User=localtimed
-Group=localtimed
+User=USER
+Group=GROUP
 
 Nice=10
 PrivateTmp=true
@@ -13,7 +13,7 @@ ProtectSystem=full
 ProtectHome=true
 NoNewPrivileges=true
 
-ExecStart=/usr/bin/localtimed
+ExecStart=BINDIR/localtimed
 
 [Install]
 WantedBy=default.target
