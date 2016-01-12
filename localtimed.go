@@ -45,7 +45,7 @@ func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 	)
 
 	if err := clientObject.SetProperty(
-		GeoclueClientInterface+".DistanceThreashold",
+		GeoclueClientInterface+".DistanceThreshold",
 		dbus.MakeVariant(uint32(1000)),
 	); err != nil {
 		return nil, err
