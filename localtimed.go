@@ -3,43 +3,66 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/Stebalien/go.dbus"
 	"github.com/bradfitz/latlong"
-	"github.com/guelfey/go.dbus"
 	"os"
+)
+
+const (
+	GeoclueBus  = "org.freedesktop.GeoClue2"
+	TimedateBus = "org.freedesktop.timedate1"
+
+	GeoclueClientInterface   = GeoclueBus + ".Client"
+	GeoclueLocationInterface = GeoclueBus + ".Location"
+	GeoclueManagerInterface  = GeoclueBus + ".Manager"
+	TimedateInterface        = TimedateBus
+)
+
+const (
+	GCLUE_ACCURACY_LEVEL_NONE = iota
+	GCLUE_ACCURACY_LEVEL_COUNTRY
+	GCLUE_ACCURACY_LEVEL_CITY
+	GCLUE_ACCURACY_LEVEL_NEIGHBORHOOD
+	GCLUE_ACCURACY_LEVEL_STREET
+	GCLUE_ACCURACY_LEVEL_EXACT
 )
 
 func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 	manager := conn.Object(
-		"org.freedesktop.GeoClue2",
-		dbus.ObjectPath("/org/freedesktop/GeoClue2/Manager"))
+		GeoclueBus,
+		"/org/freedesktop/GeoClue2/Manager",
+	)
 
 	var clientPath dbus.ObjectPath
 
-	if err := manager.Call("org.freedesktop.GeoClue2.Manager.GetClient", 0).Store(&clientPath); err != nil {
+	if err := manager.Call(GeoclueManagerInterface+".GetClient", 0).Store(&clientPath); err != nil {
 		return nil, err
 	}
 
 	clientObject := conn.Object(
-		"org.freedesktop.GeoClue2",
+		GeoclueBus,
 		clientPath,
 	)
 
-	if call := clientObject.Call(
-		"org.freedesktop.DBus.Properties.Set",
-		0,
-		"org.freedesktop.GeoClue2.Client",
-		"DistanceThreshold",
-		dbus.MakeVariant(uint32(1000))); call.Err != nil {
-		return nil, call.Err
+	if err := clientObject.SetProperty(
+		GeoclueClientInterface+".DistanceThreashold",
+		dbus.MakeVariant(1000),
+	); err != nil {
+		return nil, err
 	}
 
-	if call := clientObject.Call(
-		"org.freedesktop.DBus.Properties.Set",
-		0,
-		"org.freedesktop.GeoClue2.Client",
-		"DesktopId",
-		dbus.MakeVariant("tzupdated")); call.Err != nil {
-		return nil, call.Err
+	if err := clientObject.SetProperty(
+		GeoclueClientInterface+".RequestedAccuracyLevel",
+		dbus.MakeVariant(GCLUE_ACCURACY_LEVEL_CITY),
+	); err != nil {
+		return nil, err
+	}
+
+	if err := clientObject.SetProperty(
+		GeoclueClientInterface+".DesktopId",
+		dbus.MakeVariant("localtimed"),
+	); err != nil {
+		return nil, err
 	}
 
 	return &GeoclueClient{
@@ -50,9 +73,9 @@ func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 }
 
 func setTimezone(conn *dbus.Conn, timezone string) error {
-	timedate := conn.Object("org.freedesktop.timedate1", "/org/freedesktop/timedate1")
+	timedate := conn.Object(TimedateBus, "/org/freedesktop/timedate1")
 	return timedate.Call(
-		"org.freedesktop.timedate1.SetTimezone",
+		TimedateInterface+".SetTimezone",
 		0,
 		timezone,
 		false).Err
@@ -78,7 +101,7 @@ func (self *GeoclueClient) Stop() error {
 	self.done = nil
 
 	return self.client.Call(
-		"org.freedesktop.GeoClue2.Client.Stop",
+		GeoclueClientInterface+".Stop",
 		0,
 	).Err
 }
@@ -91,17 +114,7 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 
 	self.done = make(chan bool)
 
-	filter := fmt.Sprintf("type='%s',sender='%s',interface='%s',member='%s',path='%s'",
-		"signal",
-		"org.freedesktop.GeoClue2",
-		"dbus.freedesktop.GeoClue2.Client",
-		"LocationUpdated",
-		self.client.Path(),
-	)
-
-	if call := self.conn.Object("org.freedesktop.DBus", "/org/freedesktop/DBus").Call("org.freedesktop.DBus.AddMatch", dbus.FlagNoAutoStart, filter); call.Err != nil {
-		return nil, call.Err
-	}
+	// We don't need to add any matches because the signals are directed at us.
 
 	signals := make(chan *dbus.Signal, 10)
 	self.conn.Signal(signals)
@@ -116,7 +129,7 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 					newLocation dbus.ObjectPath
 				)
 
-				if signal.Name != "org.freedesktop.GeoClue2.Client.LocationUpdated" {
+				if signal.Name != GeoclueClientInterface+".LocationUpdated" {
 					continue
 				}
 
@@ -133,7 +146,7 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 	}()
 
 	if call := self.client.Call(
-		"org.freedesktop.GeoClue2.Client.Start",
+		GeoclueClientInterface+".Start",
 		0,
 	); call.Err != nil {
 		self.done <- true
@@ -144,10 +157,10 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 }
 
 func (self *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
-	locationObject := self.conn.Object("org.freedesktop.GeoClue2", location)
+	locationObject := self.conn.Object(GeoclueBus, location)
 
 	lat, err := locationObject.GetProperty(
-		"org.freedesktop.GeoClue2.Location.Latitude",
+		GeoclueLocationInterface + ".Latitude",
 	)
 
 	if err != nil {
@@ -157,7 +170,7 @@ func (self *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location)
 	loc.Latitude = lat.Value().(float64)
 
 	lon, err := locationObject.GetProperty(
-		"org.freedesktop.GeoClue2.Location.Longitude",
+		GeoclueLocationInterface + ".Longitude",
 	)
 
 	if err != nil {

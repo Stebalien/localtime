@@ -1,9 +1,9 @@
 [Unit]
-Description=Mailbox synchronization service
+Description=Timezone Updater Daemon
 
 [Service]
-User=tzupdated
-Group=tzupdated
+User=localtimed
+Group=localtimed
 
 Nice=10
 PrivateTmp=true
@@ -13,7 +13,7 @@ ProtectSystem=full
 ProtectHome=true
 NoNewPrivileges=true
 
-ExecStart=/usr/bin/tzupdated
+ExecStart=/usr/bin/localtimed
 
 [Install]
 WantedBy=default.target
