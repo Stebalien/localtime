@@ -46,14 +46,14 @@ func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 
 	if err := clientObject.SetProperty(
 		GeoclueClientInterface+".DistanceThreashold",
-		dbus.MakeVariant(1000),
+		dbus.MakeVariant(uint32(1000)),
 	); err != nil {
 		return nil, err
 	}
 
 	if err := clientObject.SetProperty(
 		GeoclueClientInterface+".RequestedAccuracyLevel",
-		dbus.MakeVariant(GCLUE_ACCURACY_LEVEL_CITY),
+		dbus.MakeVariant(uint32(GCLUE_ACCURACY_LEVEL_CITY)),
 	); err != nil {
 		return nil, err
 	}
