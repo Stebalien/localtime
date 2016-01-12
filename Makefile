@@ -1,4 +1,4 @@
-PREFIX 	?= "/usr/local"
+PREFIX 	?= /usr/local
 BINDIR  ?= $(PREFIX)/bin
 
 TARGETS = tzupdated
@@ -12,7 +12,7 @@ clean:
 
 install: all
 	install -Dm755 tzupdated $(DESTDIR)$(BINDIR)/tzupdated
-	install -Dm644 data/polkit.rules $(DESTDIR)$(PREFIX)/share/polkit-1/rules.d/40-tzupdate.rules
+	install -Dm640 data/polkit.rules $(DESTDIR)$(PREFIX)/share/polkit-1/rules.d/40-tzupdate.rules
 	install -Dm644 data/tzupdate.service $(DESTDIR)$(PREFIX)/lib/systemd/system/tzupdate.service
 	install -Dm644 data/sysusers.conf $(DESTDIR)$(PREFIX)/lib/sysusers.d/tzupdate.conf
 
