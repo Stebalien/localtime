@@ -5,9 +5,7 @@ Description=Mailbox synchronization service
 User=tzupdated
 Group=tzupdated
 
-Nice=19
-IOSchedulingClass=idle
-CPUSchedulingPolicy=idle
+Nice=10
 PrivateTmp=true
 PrivateDevices=true
 PrivateNetwork=true
