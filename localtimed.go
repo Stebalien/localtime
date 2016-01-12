@@ -51,7 +51,10 @@ func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 
 	var clientPath dbus.ObjectPath
 
-	if err := manager.Call(GeoclueManagerInterface+".GetClient", 0).Store(&clientPath); err != nil {
+	if err := manager.Call(
+		GeoclueManagerInterface+".GetClient",
+		0,
+	).Store(&clientPath); err != nil {
 		return nil, err
 	}
 
@@ -149,7 +152,11 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 					continue
 				}
 
-				if err := dbus.Store(signal.Body, &oldLocation, &newLocation); err != nil {
+				if err := dbus.Store(
+					signal.Body,
+					&oldLocation,
+					&newLocation,
+				); err != nil {
 					panic("signal type")
 				}
 
