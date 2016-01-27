@@ -7,6 +7,8 @@ TARGETS = localtimed localtime.service polkit.rules sysusers.conf
 
 export GOPATH = $(CURDIR)
 
+.PHONY: all clean install-user install
+
 all: $(TARGETS)
 
 clean:
