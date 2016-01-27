@@ -18,12 +18,14 @@ If you have systemd-sysusers, either reboot or run manually run systemd-sysusers
 
 # Dependencies
 
+## Runtime
+
 * geoclue2
 * systemd
 * dbus
 * polkit (to run as a non-root user)
 
-# Build Dependencies
+## Build
 
 * go
 * make
