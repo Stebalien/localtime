@@ -12,6 +12,9 @@ all: $(TARGETS)
 clean:
 	-rm -f $(TARGETS)
 
+install-user:
+	useradd -r -U localtimed
+
 install: all
 	install -Dm755 localtimed $(DESTDIR)$(BINDIR)/localtimed
 	install -Dm640 polkit.rules $(DESTDIR)$(PREFIX)/share/polkit-1/rules.d/40-localtime.rules
