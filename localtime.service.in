@@ -10,6 +10,8 @@ PrivateTmp=true
 PrivateDevices=true
 PrivateNetwork=true
 ProtectSystem=full
+ProtectControlGroups=true
+ProtectKernelTunables=true
 ProtectHome=true
 NoNewPrivileges=true
 
