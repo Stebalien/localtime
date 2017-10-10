@@ -3,13 +3,13 @@ Description=Timezone Updater Daemon
 
 [Service]
 User=USER
-Group=GROUP
+DynamicUser=true
 
 Nice=10
 PrivateTmp=true
 PrivateDevices=true
 PrivateNetwork=true
-ProtectSystem=full
+ProtectSystem=strict
 ProtectControlGroups=true
 ProtectKernelTunables=true
 ProtectHome=true

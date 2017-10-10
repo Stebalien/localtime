@@ -15,13 +15,6 @@ Otherwise, follow the instructions below.
     $ make
     $ sudo make install
 
-#### User and Group
-
-If you have systemd-sysusers, either reboot or run manually run systemd-sysusers to create the localtimed user and group. If you don't have systemd-sysusers, you'll have to manually create the user and group:
-
-    $ ### Only run this if you don't have systemd-sysusers. ###
-    $ sudo make install-user
-
 ## Enable and start
 
     $ sudo systemctl enable --now localtime.service
@@ -31,7 +24,7 @@ If you have systemd-sysusers, either reboot or run manually run systemd-sysusers
 ### Runtime
 
 * geoclue2
-* systemd
+* systemd >= 235 (for full dynamic user support)
 * dbus
 * polkit (to run as a non-root user)
 
