@@ -1,5 +1,6 @@
 [Unit]
 Description=Timezone Updater Daemon
+PartOf=geoclue.service
 
 [Service]
 User=USER
