@@ -17,7 +17,6 @@
 package main
 
 import (
-	"errors"
 	"log"
 
 	"github.com/bradfitz/latlong"
@@ -34,6 +33,7 @@ const (
 	TimedateInterface        = TimedateBus
 )
 
+//nolint
 const (
 	GCLUE_ACCURACY_LEVEL_NONE         = 0
 	GCLUE_ACCURACY_LEVEL_COUNTRY      = 1
@@ -87,7 +87,7 @@ func NewGeoclueClient(conn *dbus.Conn) (*GeoclueClient, error) {
 	return &GeoclueClient{
 		client: clientObject,
 		conn:   conn,
-		done:   nil,
+		done:   make(chan struct{}),
 	}, nil
 }
 
@@ -108,30 +108,20 @@ type Location struct {
 type GeoclueClient struct {
 	client dbus.BusObject
 	conn   *dbus.Conn
-	done   chan bool
+	done   chan struct{}
 }
 
-func (g *GeoclueClient) Stop() error {
-	if g.done != nil {
-		return errors.New("Not Running")
-	}
-
-	g.done <- true
-	g.done = nil
-
-	return g.client.Call(
+func (g *GeoclueClient) Close() error {
+	err := g.client.Call(
 		GeoclueClientInterface+".Stop",
 		0,
 	).Err
+
+	close(g.done)
+	return err
 }
 
 func (g *GeoclueClient) Start() (chan Location, error) {
-
-	if g.done != nil {
-		return nil, errors.New("Already started")
-	}
-
-	g.done = make(chan bool)
 
 	// We don't need to add any matches because the signals are directed at us.
 
@@ -172,14 +162,13 @@ func (g *GeoclueClient) Start() (chan Location, error) {
 		GeoclueClientInterface+".Start",
 		0,
 	); call.Err != nil {
-		g.done <- true
-		g.done = nil
+		close(g.done)
 		return nil, call.Err
 	}
 	return output, nil
 }
 
-func (g *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
+func (g *GeoclueClient) readLocation(location dbus.ObjectPath) Location {
 	locationObject := g.conn.Object(GeoclueBus, location)
 
 	lat, err := locationObject.GetProperty(
@@ -190,8 +179,6 @@ func (g *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
 		panic("Missing latitude")
 	}
 
-	loc.Latitude = lat.Value().(float64)
-
 	lon, err := locationObject.GetProperty(
 		GeoclueLocationInterface + ".Longitude",
 	)
@@ -199,8 +186,11 @@ func (g *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
 	if err != nil {
 		panic("Missing longitude")
 	}
-	loc.Longitude = lon.Value().(float64)
-	return
+
+	return Location{
+		Latitude:  lat.Value().(float64),
+		Longitude: lon.Value().(float64),
+	}
 }
 
 func main() {
@@ -219,7 +209,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to start GeoClue2 Client:", err)
 	}
-	defer client.Stop()
+	defer client.Close()
 
 	old_timezone := ""
 	for loc := range updates {
@@ -240,6 +230,7 @@ func main() {
 			log.Println("Failed to set timezone:", new_timezone)
 			continue
 		}
+		log.Println("Updated timezone to:", new_timezone)
 		old_timezone = new_timezone
 	}
 }
