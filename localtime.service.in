@@ -13,6 +13,7 @@ PrivateNetwork=true
 ProtectSystem=strict
 ProtectControlGroups=true
 ProtectKernelTunables=true
+ProtectKernelModules=true
 ProtectHome=true
 NoNewPrivileges=true
 
