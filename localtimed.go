@@ -111,32 +111,32 @@ type GeoclueClient struct {
 	done   chan bool
 }
 
-func (self *GeoclueClient) Stop() error {
-	if self.done != nil {
+func (g *GeoclueClient) Stop() error {
+	if g.done != nil {
 		return errors.New("Not Running")
 	}
 
-	self.done <- true
-	self.done = nil
+	g.done <- true
+	g.done = nil
 
-	return self.client.Call(
+	return g.client.Call(
 		GeoclueClientInterface+".Stop",
 		0,
 	).Err
 }
 
-func (self *GeoclueClient) Start() (chan Location, error) {
+func (g *GeoclueClient) Start() (chan Location, error) {
 
-	if self.done != nil {
+	if g.done != nil {
 		return nil, errors.New("Already started")
 	}
 
-	self.done = make(chan bool)
+	g.done = make(chan bool)
 
 	// We don't need to add any matches because the signals are directed at us.
 
 	signals := make(chan *dbus.Signal, 10)
-	self.conn.Signal(signals)
+	g.conn.Signal(signals)
 
 	output := make(chan Location)
 	go func() {
@@ -160,27 +160,27 @@ func (self *GeoclueClient) Start() (chan Location, error) {
 					panic("signal type")
 				}
 
-				output <- self.readLocation(newLocation)
-			case <-self.done:
+				output <- g.readLocation(newLocation)
+			case <-g.done:
 				close(output)
 				return
 			}
 		}
 	}()
 
-	if call := self.client.Call(
+	if call := g.client.Call(
 		GeoclueClientInterface+".Start",
 		0,
 	); call.Err != nil {
-		self.done <- true
-		self.done = nil
+		g.done <- true
+		g.done = nil
 		return nil, call.Err
 	}
 	return output, nil
 }
 
-func (self *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
-	locationObject := self.conn.Object(GeoclueBus, location)
+func (g *GeoclueClient) readLocation(location dbus.ObjectPath) (loc Location) {
+	locationObject := g.conn.Object(GeoclueBus, location)
 
 	lat, err := locationObject.GetProperty(
 		GeoclueLocationInterface + ".Latitude",
