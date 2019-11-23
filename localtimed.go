@@ -18,8 +18,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/bradfitz/latlong"
 	"github.com/godbus/dbus/v5"
@@ -208,40 +207,37 @@ func main() {
 	conn, err := dbus.SystemBus()
 
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to connect to system bus:", err)
-		os.Exit(1)
+		log.Fatalln("Failed to connect to system bus:", err)
 	}
 
 	client, err := NewGeoclueClient(conn)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to initialize GeoClue2 Client:", err)
-		os.Exit(1)
+		log.Fatalln("Failed to initialize GeoClue2 Client:", err)
 	}
 
 	updates, err := client.Start()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Failed to start GeoClue2 Client:", err)
-		os.Exit(1)
+		log.Fatalln("Failed to start GeoClue2 Client:", err)
 	}
 	defer client.Stop()
 
 	old_timezone := ""
 	for loc := range updates {
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Failed to get location:", err)
+			log.Println("Failed to get location:", err)
 			continue
 		}
 
 		new_timezone := latlong.LookupZoneName(loc.Latitude, loc.Longitude)
 		if new_timezone == "" {
-			fmt.Fprintln(os.Stderr, "Failed to get timezone from location:", loc)
+			log.Println("Failed to get timezone from location:", loc)
 			continue
 		}
 		if new_timezone == old_timezone {
 			continue
 		}
 		if err := setTimezone(conn, new_timezone); err != nil {
-			fmt.Fprintln(os.Stderr, "Failed to set timezone:", new_timezone)
+			log.Println("Failed to set timezone:", new_timezone)
 			continue
 		}
 		old_timezone = new_timezone
