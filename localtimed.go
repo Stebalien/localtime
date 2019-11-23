@@ -17,11 +17,12 @@
 package main
 
 import (
-	"dbus"
 	"errors"
 	"fmt"
-	"latlong"
 	"os"
+
+	"github.com/bradfitz/latlong"
+	"github.com/godbus/dbus/v5"
 )
 
 const (
@@ -106,7 +107,7 @@ type Location struct {
 }
 
 type GeoclueClient struct {
-	client *dbus.Object
+	client dbus.BusObject
 	conn   *dbus.Conn
 	done   chan bool
 }

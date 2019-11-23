@@ -2,9 +2,8 @@ PREFIX 	?= /usr/local
 BINDIR  ?= $(PREFIX)/bin
 SERVICE_USER    ?= localtimed
 
+GO111MODULE = on
 TARGETS = localtimed localtime.service polkit.rules
-
-export GOPATH = $(CURDIR)
 
 .PHONY: all clean install-user install
 

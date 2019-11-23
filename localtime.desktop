@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=application
+Version=1.0
+Name=localtime
+Comment=Timezone Updater Daemon
+NoDisplay=true
