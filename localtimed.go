@@ -17,10 +17,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os/exec"
+	"strings"
 
 	"github.com/bradfitz/latlong"
 	"github.com/godbus/dbus/v5"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -31,6 +35,8 @@ const (
 	GeoclueLocationInterface = GeoclueBus + ".Location"
 	GeoclueManagerInterface  = GeoclueBus + ".Manager"
 	TimedateInterface        = TimedateBus
+
+	GeoclueAgent = "/usr/lib/geoclue-2.0/demos/agent"
 )
 
 //nolint
@@ -128,6 +134,29 @@ func (g *GeoclueClient) Start() (chan Location, error) {
 	signals := make(chan *dbus.Signal, 10)
 	g.conn.Signal(signals)
 
+	stopAgent := func() {}
+
+	// Try once without starting an agent.
+	if call := g.client.Call(
+		GeoclueClientInterface+".Start",
+		0,
+	); call.Err != nil {
+		if !strings.Contains(call.Err.Error(), "no agent for UID") {
+			return nil, call.Err
+		}
+
+		// Now try to start the demo agent.
+		agentCmd := exec.Command(GeoclueAgent)
+		if err := agentCmd.Start(); err != nil {
+			return nil, fmt.Errorf("failed to start GeoClue2 agent: %w", err)
+		}
+
+		stopAgent = func() {
+			agentCmd.Process.Signal(unix.SIGTERM)
+			agentCmd.Wait()
+		}
+	}
+
 	output := make(chan Location)
 	go func() {
 		for {
@@ -152,19 +181,13 @@ func (g *GeoclueClient) Start() (chan Location, error) {
 
 				output <- g.readLocation(newLocation)
 			case <-g.done:
+				stopAgent()
 				close(output)
 				return
 			}
 		}
 	}()
 
-	if call := g.client.Call(
-		GeoclueClientInterface+".Start",
-		0,
-	); call.Err != nil {
-		close(g.done)
-		return nil, call.Err
-	}
 	return output, nil
 }
 
