@@ -16,6 +16,11 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectHome=true
 NoNewPrivileges=true
+ProtectClock=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectProc=true
+MemoryDenyWriteExecute=true
 
 ExecStart=BINDIR/localtimed
 
