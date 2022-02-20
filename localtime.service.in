@@ -19,7 +19,7 @@ NoNewPrivileges=true
 ProtectClock=true
 ProtectKernelLogs=true
 ProtectHostname=true
-ProtectProc=noaccess
+ProtectProc=default
 MemoryDenyWriteExecute=true
 
 ExecStart=BINDIR/localtimed
