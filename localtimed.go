@@ -155,6 +155,13 @@ func (g *GeoclueClient) Start() (chan Location, error) {
 			agentCmd.Process.Signal(unix.SIGTERM)
 			agentCmd.Wait()
 		}
+		if call := g.client.Call(
+			GeoclueClientInterface+".Start",
+			0,
+		); call.Err != nil {
+			stopAgent()
+			return nil, call.Err
+		}
 	}
 
 	output := make(chan Location)
