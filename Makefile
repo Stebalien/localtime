@@ -3,7 +3,7 @@ BINDIR	?= $(PREFIX)/bin
 SERVICE_USER	?= localtimed
 
 GO111MODULE = on
-TARGETS = localtimed localtime.service localtime.sysusers polkit.rules geoclue-demo-agent.service
+TARGETS = localtimed localtime.service localtime.sysusers polkit.rules localtime-geoclue-agent.service
 
 .PHONY: all clean install-user install
 
@@ -20,7 +20,7 @@ install: all
 	install -Dm640 polkit.rules $(DESTDIR)$(PREFIX)/share/polkit-1/rules.d/40-localtime.rules
 	install -Dm644 localtime.service $(DESTDIR)$(PREFIX)/lib/systemd/system/localtime.service
 	install -Dm644 localtime.sysusers $(DESTDIR)$(PREFIX)/lib/sysusers.d/localtime.conf
-	install -Dm644 geoclue-demo-agent.service $(DESTDIR)$(PREFIX)/lib/systemd/system/geoclue-demo-agent.service
+	install -Dm644 localtime-geoclue-agent.service $(DESTDIR)$(PREFIX)/lib/systemd/system/localtime-geoclue-agent.service
 
 %: %.in
 	m4 -DBINDIR="$(BINDIR)" \
