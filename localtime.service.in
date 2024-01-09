@@ -4,7 +4,6 @@ PartOf=geoclue.service
 
 [Service]
 User=USER
-DynamicUser=true
 
 Nice=10
 PrivateTmp=true
