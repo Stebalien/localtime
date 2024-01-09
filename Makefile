@@ -1,6 +1,6 @@
-PREFIX 	?= /usr/local
-BINDIR  ?= $(PREFIX)/bin
-SERVICE_USER    ?= localtimed
+PREFIX	?= /usr/local
+BINDIR	?= $(PREFIX)/bin
+SERVICE_USER	?= localtimed
 
 GO111MODULE = on
 TARGETS = localtimed localtime.service localtime.sysusers polkit.rules geoclue-demo-agent.service
