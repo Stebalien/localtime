@@ -1,10 +1,11 @@
 [Unit]
 Description=Timezone Updater Daemon
 PartOf=geoclue.service
+Wants=localtime-geoclue-agent.service
+After=localtime-geoclue-agent.service
 
 [Service]
 User=USER
-DynamicUser=true
 
 Nice=10
 PrivateTmp=true
