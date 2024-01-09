@@ -29,7 +29,7 @@ Otherwise, follow the instructions below.
 
 ## Enable and start
 
-    $ sudo systemctl enable --now geoclue-demo-agent.service localtime.service
+    $ sudo systemctl enable --now localtime.service
 
 ## Dependencies
 
