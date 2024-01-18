@@ -1,9 +1,26 @@
 [Unit]
 Description=Geoclue Demo agent
 PartOf=localtime.service
+RefuseManualStart=true
+RefuseManualStop=true
 Documentation=https://www.freedesktop.org/wiki/Software/GeoClue/
 
 [Service]
 User=USER
+Nice=10
+PrivateTmp=true
+PrivateDevices=true
+PrivateNetwork=true
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectHome=true
+NoNewPrivileges=true
+ProtectClock=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectProc=default
+MemoryDenyWriteExecute=true
 
 ExecStart=/usr/lib/geoclue-2.0/demos/agent

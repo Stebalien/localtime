@@ -6,7 +6,6 @@ After=localtime-geoclue-agent.service
 
 [Service]
 User=USER
-
 Nice=10
 PrivateTmp=true
 PrivateDevices=true
