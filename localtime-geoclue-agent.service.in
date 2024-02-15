@@ -23,4 +23,4 @@ ProtectHostname=true
 ProtectProc=default
 MemoryDenyWriteExecute=true
 
-ExecStart=/usr/lib/geoclue-2.0/demos/agent
+ExecStart=LIBEXECDIR/geoclue-2.0/demos/agent

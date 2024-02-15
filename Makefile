@@ -1,5 +1,6 @@
 PREFIX	?= /usr/local
 BINDIR	?= $(PREFIX)/bin
+LIBEXECDIR	?= $(PREFIX)/lib
 SERVICE_USER	?= localtimed
 
 GO111MODULE = on
@@ -24,6 +25,7 @@ install: all
 
 %: %.in
 	m4 -DBINDIR="$(BINDIR)" \
+		-DLIBEXECDIR="$(LIBEXECDIR)" \
 		-DPREFIX="$(PREFIX)" \
 		-DUSER="$(SERVICE_USER)" \
 		$< > $@
